@@ -158,8 +158,7 @@ As part of my cybersecurity career development, this project reinforces:
 ## Contact
 
 For questions about this project or to discuss security engineering opportunities:
-- GitHub: [@ssjlox](https://github.com/ssjlox) *(update with your actual GitHub username)*
-- LinkedIn: *(add your LinkedIn profile)*
+- GitHub: [@isolomonleecode](https://github.com/isolomonleecode)
 
 ---
 
