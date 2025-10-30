@@ -1,6 +1,6 @@
 # Homelab Security Hardening Project
 
-**Author:** ssjlox
+**Author:** isolomonleecode
 **Status:** In Progress
 **Certifications:** CompTIA Security+
 **Focus Areas:** Security Engineering, Infrastructure Security, Container Security
