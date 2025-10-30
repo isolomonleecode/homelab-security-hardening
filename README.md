@@ -69,21 +69,38 @@ This repository documents the systematic security audit, hardening, and monitori
 
 ```
 homelab-security-hardening/
-├── docs/                          # Documentation & findings
+├── docs/                          # Technical documentation
 │   ├── 01-infrastructure-inventory.md
-│   ├── 02-security-audit-findings.md
 │   ├── 03-pihole-dns-configuration.md
-│   ├── 04-container-hardening.md
-│   └── certification-concepts.md
+│   ├── 04-vulnerability-assessment.md
+│   ├── 05-hardening-results.md
+│   ├── 06-monitoring-logging.md
+│   ├── certification-concepts.md
+│   └── README.md
 ├── configs/                       # Configuration files
 │   ├── pihole/                    # Pi-hole DNS configs
-│   ├── docker/                    # Docker Compose & configs
-│   └── nginx/                     # Nginx reverse proxy configs
-├── scripts/                       # Automation scripts
-│   ├── security-scan.sh
-│   └── inventory.sh
-└── findings/                      # Security assessment results
-    └── vulnerability-reports/
+│   ├── docker/                    # Docker Compose files
+│   ├── nginx/                     # Reverse proxy configs
+│   ├── logging/                   # Loki/Promtail configs
+│   └── README.md
+├── scripts/                       # Automation & security tools
+│   ├── test-dns.sh
+│   ├── add-pihole-dns.sh
+│   ├── scan-containers.sh
+│   ├── scan-all-containers.sh
+│   ├── hardening-audit.sh
+│   └── README.md
+├── findings/                      # Security assessment results
+│   ├── EXECUTIVE-SUMMARY.md
+│   ├── REMEDIATION-ADMINER.md
+│   ├── ADMINER-ACCESS-GUIDE.md
+│   ├── vulnerability-reports/
+│   └── README.md
+├── sessions/                      # Session logs & completion summaries
+│   ├── SESSION-1-COMPLETE.md
+│   └── README.md
+├── PROGRESS.md                    # Detailed progress tracking
+└── README.md                      # This file
 ```
 
 ## Methodology
@@ -144,16 +161,59 @@ As part of my cybersecurity career development, this project reinforces:
 ## Progress Tracking
 
 - [x] Project initialization & repository setup
-- [ ] Phase 1: Infrastructure inventory & baseline
-- [ ] Phase 2: Pi-hole DNS configuration for local services
-- [ ] Phase 3: Container vulnerability scanning
-- [ ] Phase 4: Security hardening implementation
-- [x] Phase 5: Monitoring & logging deployment (Loki on Grafana host; Promtail on Pi4)
-- [ ] Phase 6: Documentation & portfolio completion
+- [x] **Phase 1:** Infrastructure inventory & baseline - [Documentation](docs/01-infrastructure-inventory.md)
+- [x] **Phase 2:** Pi-hole DNS configuration for local services - [Documentation](docs/03-pihole-dns-configuration.md)
+- [x] **Phase 3:** Container vulnerability scanning (4 of 18 containers) - [Findings](findings/EXECUTIVE-SUMMARY.md)
+  - [x] Critical vulnerability mitigation (Adminer) - [Remediation](findings/REMEDIATION-ADMINER.md)
+- [ ] **Phase 4:** Security hardening implementation
+  - [ ] Database binding to localhost
+  - [ ] Docker network segmentation
+  - [ ] Container privilege reduction
+- [x] **Phase 5:** Monitoring & logging deployment - [Documentation](docs/06-monitoring-logging.md)
+  - [x] Loki deployment on Grafana host (192.168.0.52:3100)
+  - [x] Promtail on Pi4 shipping Docker logs
+  - [ ] Grafana dashboards for security monitoring
+- [ ] **Phase 6:** Documentation & portfolio completion
+  - [x] Repository published to GitHub
+  - [x] Professional README and documentation structure
+  - [ ] Comprehensive vulnerability assessment (15 containers remaining)
+  - [ ] Final hardening validation
+
+## Key Achievements
+
+### Security Improvements Implemented
+- ✅ **Critical Vulnerability Mitigation:** Secured Adminer with 2 CRITICAL + 2 HIGH CVEs using compensating controls (localhost-only binding)
+- ✅ **Complete Infrastructure Baseline:** Documented 18 active containers, network architecture, and attack surface
+- ✅ **Local DNS Implementation:** Configured 14 service DNS records for improved usability and security
+- ✅ **Centralized Logging:** Deployed Loki + Promtail for container log aggregation and monitoring
+- ✅ **Vulnerability Scanning:** Established Trivy scanning workflow for ongoing vulnerability management
+
+### Portfolio Highlights
+- **Risk Management:** Demonstrated risk-based decision making with Adminer remediation
+- **Incident Response:** 24-hour critical vulnerability mitigation
+- **Security Automation:** 7 custom scripts for scanning, DNS management, and auditing
+- **Professional Documentation:** 3,000+ lines of technical documentation
+- **Real-World Application:** Security+ and Network+ concepts applied to production environment
 
 ## Key Takeaways & Lessons Learned
 
-*This section will be updated as the project progresses*
+### Technical Insights
+- **Container Security:** Compensating controls are effective when vendor patches unavailable
+- **DNS Architecture:** Pi-hole dnsmasq configuration requires understanding of file hierarchy and restart procedures
+- **Network Isolation:** Docker network boundaries affect DNS forwarding and service discovery
+- **Log Aggregation:** Loki/Promtail provides lightweight, effective centralized logging for containers
+
+### Methodology
+- **Document First:** Baseline documentation critical before making changes
+- **Automate Repetitive Tasks:** Scripts reduce errors and save time
+- **Risk-Based Prioritization:** Focus on CRITICAL/HIGH severity findings first
+- **Defense in Depth:** Multiple layers of security (SSH auth + localhost binding) reduce risk effectively
+
+### Career Development
+- **Practical Experience:** Hands-on application of certification concepts builds deeper understanding
+- **Portfolio Value:** Real vulnerability remediation more impressive than theoretical knowledge
+- **Documentation Skills:** Clear technical writing essential for security roles
+- **Problem Solving:** Troubleshooting experience valuable for interviews and daily work
 
 ## Contact
 

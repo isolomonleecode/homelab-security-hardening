@@ -1,0 +1,56 @@
+# Security Sensitive Files
+*.env
+*.key
+*.pem
+*.crt
+*.cert
+*.p12
+*.pfx
+credentials.json
+secrets.yaml
+*.secret
+
+# Scan outputs (keep reports, ignore raw data)
+*.json.raw
+*.xml.raw
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# Log files
+*.log
+logs/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# OS generated files
+Thumbs.db
+.Trash-*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+
+# Node modules (if any JS tools used)
+node_modules/
+
+# Private notes
+NOTES-PRIVATE.md
+TODO-PRIVATE.md
