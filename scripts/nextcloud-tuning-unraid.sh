@@ -33,11 +33,11 @@ sleep 15
 
 # Apply PHP-FPM tuning
 log "Applying PHP-FPM worker pool tuning..."
-docker exec ${CONTAINER} sed -i "s/^pm\.max_children = .*/pm.max_children = 100/" /etc/php84/php-fpm.d/www.conf
-docker exec ${CONTAINER} sed -i "s/^pm\.start_servers = .*/pm.start_servers = 20/" /etc/php84/php-fpm.d/www.conf
-docker exec ${CONTAINER} sed -i "s/^pm\.min_spare_servers = .*/pm.min_spare_servers = 10/" /etc/php84/php-fpm.d/www.conf
-docker exec ${CONTAINER} sed -i "s/^pm\.max_spare_servers = .*/pm.max_spare_servers = 35/" /etc/php84/php-fpm.d/www.conf
-log "PHP-FPM settings: max_children=100, start=20, min_spare=10, max_spare=35"
+docker exec ${CONTAINER} sed -i "s/^pm\.max_children = .*/pm.max_children = 200/" /etc/php84/php-fpm.d/www.conf
+docker exec ${CONTAINER} sed -i "s/^pm\.start_servers = .*/pm.start_servers = 40/" /etc/php84/php-fpm.d/www.conf
+docker exec ${CONTAINER} sed -i "s/^pm\.min_spare_servers = .*/pm.min_spare_servers = 20/" /etc/php84/php-fpm.d/www.conf
+docker exec ${CONTAINER} sed -i "s/^pm\.max_spare_servers = .*/pm.max_spare_servers = 60/" /etc/php84/php-fpm.d/www.conf
+log "PHP-FPM settings: max_children=200, start=40, min_spare=20, max_spare=60"
 
 # Apply Nginx timeout tuning
 log "Applying Nginx timeout configuration..."
