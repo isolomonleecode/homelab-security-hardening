@@ -148,7 +148,7 @@ As part of my cybersecurity career development, this project reinforces:
 - [ ] Phase 2: Pi-hole DNS configuration for local services
 - [ ] Phase 3: Container vulnerability scanning
 - [ ] Phase 4: Security hardening implementation
-- [ ] Phase 5: Monitoring & logging deployment
+- [x] Phase 5: Monitoring & logging deployment (Loki on Grafana host; Promtail on Pi4)
 - [ ] Phase 6: Documentation & portfolio completion
 
 ## Key Takeaways & Lessons Learned
@@ -158,8 +158,7 @@ As part of my cybersecurity career development, this project reinforces:
 ## Contact
 
 For questions about this project or to discuss security engineering opportunities:
-- GitHub: [@ssjlox](https://github.com/ssjlox) *(update with your actual GitHub username)*
-- LinkedIn: *(add your LinkedIn profile)*
+- GitHub: [@ssjlox](https://github.com/isolomonleecode)
 
 ---
 

@@ -156,3 +156,64 @@ http://pihole.homelab/admin
 **Services Configured:** 18
 
 **Next Session:** Phase 3 - Vulnerability Assessment with automated scanning
+
+## Session 2: October 30, 2025
+
+### Completed Tasks
+
+#### Phase 5: Monitoring & Logging (Initial Deploy) ✅
+- Deployed local Loki on Grafana host (port 3100)
+- Connected `loki` container to existing Docker network `saml-lab_saml-net`
+- Deployed Promtail on Raspberry Pi 4 (Ubuntu) to ship Docker logs
+- Configured Promtail client to push to `http://192.168.0.52:3100/loki/api/v1/push`
+- Verified ingestion in Grafana Explore with query `{host="pi4"}`
+
+**Technical Details:**
+- Grafana UI: `http://grafana.homelab.local:8083`
+- Loki container: `grafana/loki:2.9.6` listening on `3100`
+- Promtail container: `grafana/promtail:2.9.6` on Pi4 with `--network host`
+- Promtail config path (Pi4): `~/sec/homelab-security-hardening/configs/logging/promtail-pi4-config.yml`
+- Promtail labels: `host=pi4`, `container`, `image`, `container_id`
+
+**Key Commands Executed:**
+```
+# On Grafana host
+docker network create observability || true
+docker rm -f loki || true
+docker run -d --name loki --network observability -p 3100:3100 \
+  -v loki-data:/loki \
+  grafana/loki:2.9.6 -config.file=/etc/loki/local-config.yaml
+
+# Connect Loki to app network for service discovery with Grafana
+docker network connect saml-lab_saml-net loki
+
+# On Pi4 (Promtail)
+docker rm -f promtail || true
+docker run -d --name promtail --network host \
+  -v /var/log:/var/log:ro \
+  -v /var/lib/docker/containers:/var/lib/docker/containers:ro \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/sec/homelab-security-hardening/configs/logging/promtail-pi4-config.yml:/etc/promtail/config.yml:ro \
+  grafana/promtail:2.9.6 \
+  -config.file=/etc/promtail/config.yml
+```
+
+**Troubleshooting & Fixes:**
+- DNS resolution failed for `grafana.homelab.local` on Pi -> used IP `192.168.0.52`
+- Grafana data source 404 resolved by attaching `loki` to `saml-lab_saml-net` and using `http://loki:3100` from Grafana container
+
+### Next Session Goals
+
+#### Phase 3: Vulnerability Assessment (Complete Coverage)
+- [ ] Run `./scripts/scan-all-containers.sh` for all services
+- [ ] Consolidate findings and remediation plan
+
+#### Phase 4: Security Hardening
+- [ ] Apply least-privilege and read-only FS where feasible
+- [ ] Bind sensitive services to localhost or internal networks
+- [ ] Network segmentation validation
+
+#### Phase 5: Monitoring & Logging
+- [ ] Add dashboards for container restarts and error rates
+- [ ] Persist Promtail with docker compose or systemd on Pi4
+- [ ] Optional: Switch Promtail client back to hostname after Pi-hole A record

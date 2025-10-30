@@ -1,0 +1,39 @@
+# Promtail configuration for Pi4 (Ubuntu) to ship Docker logs off-box.
+# Recommended: Send to Grafana Cloud Loki or a Loki on the Pi4 (not Unraid).
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+clients:
+  # Option A: Grafana Cloud Loki (replace with your details)
+  - url: https://logs-prod-XXX.grafana.net/loki/api/v1/push
+    basic_auth:
+      username: YOUR_GRAFANA_CLOUD_USER
+      password: YOUR_GRAFANA_CLOUD_API_KEY
+
+  # Option B: Local Loki on Pi4
+  # - url: http://localhost:3100/loki/api/v1/push
+
+positions:
+  filename: /tmp/positions.yaml
+
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 30s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        target_label: 'container'
+        regex: '/(.*)'
+      - source_labels: ['__meta_docker_container_image']
+        target_label: 'image'
+      - source_labels: ['__meta_docker_container_id']
+        target_label: 'container_id'
+      - replacement: 'pi4'
+        target_label: 'host'
+    pipeline_stages:
+      - docker: {}
+
+
