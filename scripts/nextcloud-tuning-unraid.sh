@@ -59,6 +59,31 @@ log "Reloading PHP-FPM and Nginx..."
 docker exec ${CONTAINER} bash -c "killall -USR2 php-fpm84 2>/dev/null || true"
 docker exec ${CONTAINER} nginx -s reload 2>/dev/null || true
 
+# Apply MariaDB tuning
+DB_CONTAINER="nextcloud-db"
+log "Applying MariaDB performance tuning..."
+
+if docker ps --filter "name=${DB_CONTAINER}" --filter "status=running" --format '{{.Names}}' | grep -q "^${DB_CONTAINER}$"; then
+    # Create MariaDB config file
+    docker exec ${DB_CONTAINER} sh -c 'cat > /etc/mysql/conf.d/nextcloud-tuning.cnf << EOF
+[mysqld]
+innodb_lock_wait_timeout = 300
+max_connections = 300
+innodb_buffer_pool_size = 2G
+innodb_log_file_size = 512M
+innodb_flush_log_at_trx_commit = 2
+innodb_flush_method = O_DIRECT
+EOF'
+
+    # Restart MariaDB to apply settings
+    log "Restarting MariaDB container to apply settings..."
+    docker restart ${DB_CONTAINER}
+    sleep 15
+    log "MariaDB settings: lock_timeout=300s, max_connections=300, buffer_pool=2G"
+else
+    log "WARNING: MariaDB container not found, skipping database tuning"
+fi
+
 # Verify settings
 log "Verifying applied settings..."
 MAX_CHILDREN=$(docker exec ${CONTAINER} grep "^pm.max_children" /etc/php84/php-fpm.d/www.conf | awk '{print $3}')
