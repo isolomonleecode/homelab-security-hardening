@@ -162,6 +162,6 @@ For questions about this project or to discuss security engineering opportunitie
 
 ---
 
-**Disclaimer:** Much of the content was helped by an LLM. However, the passion, process, and commitment originiates with me, an imperfect, effeciency-driven individual.
+**Disclaimer:** Much of the content was helped by an LLM. However, the passion, process, and commitment originates with me, an imperfect, effeciency-driven individual.
 
 **Note:** This is a personal homelab environment. All security testing is conducted on systems I own and operate. No production systems or unauthorized access is involved.
