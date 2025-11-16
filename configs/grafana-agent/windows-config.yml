@@ -1,0 +1,136 @@
+server:
+  log_level: info
+
+# Metrics collection
+metrics:
+  wal_directory: 'C:/ProgramData/Grafana Agent'
+  global:
+    scrape_interval: 15s
+    remote_write:
+      - url: http://192.168.0.19:9090/api/v1/write
+
+  configs:
+    - name: windows-metrics
+      scrape_configs:
+        # Self-scraping
+        - job_name: 'agent'
+          static_configs:
+            - targets: ['localhost:12345']
+              labels:
+                hostname: 'windows-laptop'  # Change to actual hostname
+                instance: 'windows-laptop'
+
+# Windows-specific metrics via windows_exporter integration
+integrations:
+  windows_exporter:
+    enabled: true
+    # Collectors to enable
+    enabled_collectors:
+      - cpu
+      - cs  # Computer System
+      - logical_disk
+      - net
+      - os
+      - process
+      - service
+      - system
+      - tcp
+      - memory
+    # Add hostname label
+    relabel_configs:
+      - target_label: hostname
+        replacement: 'windows-laptop'  # Change to actual hostname
+      - target_label: instance
+        replacement: 'windows-laptop'
+
+# Log collection from Windows Event Logs
+logs:
+  configs:
+    - name: windows-logs
+      # Send to Loki
+      clients:
+        - url: http://192.168.0.19:3100/loki/api/v1/push
+
+      # Track positions
+      positions:
+        filename: 'C:/ProgramData/Grafana Agent/positions.yaml'
+
+      scrape_configs:
+        # Windows Security Event Log
+        - job_name: windows-security
+          windows_events:
+            use_incoming_timestamp: true
+            eventlog_name: "Security"
+            labels:
+              job: 'windows-security'
+              hostname: 'windows-laptop'  # Change to actual hostname
+          # Common Security Event IDs:
+          # 4624 - Successful logon
+          # 4625 - Failed logon
+          # 4634 - Logoff
+          # 4648 - Logon using explicit credentials
+          # 4672 - Special privileges assigned
+          # 4720 - User account created
+          # 4726 - User account deleted
+          pipeline_stages:
+            - match:
+                selector: '{job="windows-security"}'
+                stages:
+                  - json:
+                      expressions:
+                        event_id: eventID
+                        level: level
+                  - labels:
+                      event_id:
+                      level:
+
+        # Windows System Event Log
+        - job_name: windows-system
+          windows_events:
+            use_incoming_timestamp: true
+            eventlog_name: "System"
+            labels:
+              job: 'windows-system'
+              hostname: 'windows-laptop'  # Change to actual hostname
+          pipeline_stages:
+            - match:
+                selector: '{job="windows-system"}'
+                stages:
+                  - json:
+                      expressions:
+                        event_id: eventID
+                        source: source
+                  - labels:
+                      event_id:
+                      source:
+
+        # Windows Application Event Log
+        - job_name: windows-application
+          windows_events:
+            use_incoming_timestamp: true
+            eventlog_name: "Application"
+            labels:
+              job: 'windows-application'
+              hostname: 'windows-laptop'  # Change to actual hostname
+          # Only capture Warning and Error level events to reduce noise
+          pipeline_stages:
+            - match:
+                selector: '{job="windows-application"}'
+                stages:
+                  - json:
+                      expressions:
+                        event_id: eventID
+                        level: level
+                  - match:
+                      selector: '{level=~"Warning|Error"}'
+                      stages:
+                        - labels:
+                            event_id:
+                            level:
+                  - drop:
+                      expression: '.*'
+                      drop_counter_reason: not_warning_or_error
+
+# Optional: Traces (disabled by default)
+traces:
+  configs: []

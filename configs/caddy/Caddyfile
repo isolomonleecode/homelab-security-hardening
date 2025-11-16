@@ -1,0 +1,45 @@
+{
+    http_port 8080
+    https_port 8443
+}
+
+# Vaultwarden via .homelab (LAN only - HTTPS with self-signed cert)
+vault.homelab:8443 {
+    tls internal
+    reverse_proxy 172.17.0.3:80
+}
+
+# Vaultwarden via Tailscale (HTTPS with Let's Encrypt cert)
+sweetrpi-desktop.tailc12764.ts.net:9000 {
+    tls /opt/caddy/certs/sweetrpi-desktop.tailc12764.ts.net.crt /opt/caddy/certs/sweetrpi-desktop.tailc12764.ts.net.key
+    reverse_proxy 172.17.0.3:80
+}
+
+# Nextcloud with proper headers and .well-known redirects
+sweetrpi-desktop.tailc12764.ts.net {
+    tls /opt/caddy/certs/sweetrpi-desktop.tailc12764.ts.net.crt /opt/caddy/certs/sweetrpi-desktop.tailc12764.ts.net.key
+
+    # CalDAV and CardDAV redirects
+    redir /.well-known/carddav /remote.php/dav 301
+    redir /.well-known/caldav /remote.php/dav 301
+    redir /.well-known/webfinger /index.php/.well-known/webfinger 301
+    redir /.well-known/nodeinfo /index.php/.well-known/nodeinfo 301
+
+    reverse_proxy https://192.168.0.51:11000 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+
+        header_up Host sweetrpi-desktop.tailc12764.ts.net
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-Proto https
+    }
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "no-referrer-when-downgrade"
+    }
+}

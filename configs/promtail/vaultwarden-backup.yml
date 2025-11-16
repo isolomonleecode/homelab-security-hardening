@@ -1,0 +1,40 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions_backup.yaml
+
+clients:
+  - url: http://100.112.203.63:3100/loki/api/v1/push
+
+scrape_configs:
+  # Vaultwarden backup logs
+  - job_name: vaultwarden-backup
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: vaultwarden-backup
+          host: sweetrpi-desktop
+          __path__: /var/log/vaultwarden-backup.log
+
+    pipeline_stages:
+      # Parse timestamp
+      - regex:
+          expression: '^\[(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]'
+      - timestamp:
+          source: timestamp
+          format: '2006-01-02 15:04:05'
+
+      # Extract log level
+      - regex:
+          expression: '\[(?P<level>INFO|WARN|ERROR)\]'
+      - labels:
+          level:
+
+      # Extract backup filename
+      - regex:
+          expression: 'vault_backup_(?P<backup_file>\d{8}_\d{6}\.sqlite3)'
+      - labels:
+          backup_file:

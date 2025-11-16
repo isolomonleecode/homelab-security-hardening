@@ -1,0 +1,108 @@
+server:
+  log_level: info
+
+# Metrics collection
+metrics:
+  wal_directory: /opt/homebrew/var/lib/grafana-agent
+  global:
+    scrape_interval: 15s
+    remote_write:
+      - url: http://192.168.0.19:9090/api/v1/write
+        # If Prometheus doesn't support remote_write, agent will still collect locally
+
+  configs:
+    - name: macos-metrics
+      scrape_configs:
+        # Self-scraping (agent's own metrics)
+        - job_name: 'agent'
+          static_configs:
+            - targets: ['localhost:12345']
+              labels:
+                hostname: 'macbook'  # Change this to actual hostname
+                instance: 'macbook'
+
+# System metrics via node_exporter integration
+integrations:
+  node_exporter:
+    enabled: true
+    # Collectors to enable
+    enabled_collectors:
+      - cpu
+      - diskstats
+      - filesystem
+      - loadavg
+      - meminfo
+      - netdev
+      - netstat
+      - stat
+      - time
+      - uname
+      - vmstat
+    # macOS-specific collectors
+    set_collectors:
+      - darwin
+    # Filesystem mount points to exclude
+    filesystem_mount_points_exclude: '^/(dev|proc|sys|var/lib/docker/.+)($|/)'
+    # Filesystem types to exclude
+    filesystem_fs_types_exclude: '^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$'
+    # Add hostname label to all metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'macbook'  # Change this to actual hostname
+      - target_label: hostname
+        replacement: 'macbook'  # Change this to actual hostname
+
+# Log collection
+logs:
+  configs:
+    - name: macos-logs
+      # Send logs to Loki
+      clients:
+        - url: http://192.168.0.19:3100/loki/api/v1/push
+
+      # Track log file positions
+      positions:
+        filename: /opt/homebrew/var/lib/grafana-agent/positions.yaml
+
+      scrape_configs:
+        # macOS system logs
+        - job_name: system
+          static_configs:
+            - targets: ['localhost']
+              labels:
+                job: 'macos-system'
+                hostname: 'macbook'  # Change this to actual hostname
+                __path__: /var/log/system.log
+          # Parse log lines
+          pipeline_stages:
+            - match:
+                selector: '{job="macos-system"}'
+                stages:
+                  # Extract timestamp, process, and message
+                  - regex:
+                      expression: '^(?P<timestamp>\w+\s+\d+\s+\d+:\d+:\d+)\s+\S+\s+(?P<process>\S+).*?:\s+(?P<message>.*)$'
+                  - labels:
+                      process:
+
+        # Application logs (if needed)
+        - job_name: user-logs
+          static_configs:
+            - targets: ['localhost']
+              labels:
+                job: 'macos-user'
+                hostname: 'macbook'  # Change this to actual hostname
+                __path__: /Users/*/Library/Logs/*.log
+
+        # Homebrew logs
+        - job_name: homebrew
+          static_configs:
+            - targets: ['localhost']
+              labels:
+                job: 'macos-homebrew'
+                hostname: 'macbook'  # Change this to actual hostname
+                __path__: /usr/local/var/log/*.log
+
+# Optional: Traces (disabled by default)
+traces:
+  configs: []

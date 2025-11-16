@@ -54,3 +54,4 @@ node_modules/
 # Private notes
 NOTES-PRIVATE.md
 TODO-PRIVATE.md
+container-updates-monitoring*.json

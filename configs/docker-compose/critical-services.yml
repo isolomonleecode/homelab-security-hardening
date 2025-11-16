@@ -1,0 +1,171 @@
+version: '3.8'
+
+# Critical Infrastructure Services Stack
+# Services: Pi-hole (DNS), Vaultwarden (Password Vault), Caddy (Reverse Proxy)
+#
+# Update: docker compose -f critical-services.yml pull && docker compose -f critical-services.yml up -d
+# Backup before update: /usr/local/bin/backup-vaultwarden
+
+networks:
+  critical_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.26.0.0/24
+
+services:
+  # Pi-hole - Network-wide DNS and ad-blocking
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    hostname: pihole
+    restart: unless-stopped
+
+    ports:
+      - "53:53/tcp"      # DNS
+      - "53:53/udp"      # DNS
+      - "80:80/tcp"      # Web interface (HTTP)
+
+    environment:
+      TZ: 'America/Chicago'
+      WEBPASSWORD: ''  # Set via docker-compose.override.yml or env file
+      FTLCONF_LOCAL_IPV4: '192.168.0.19'
+      PIHOLE_DNS_: '1.1.1.1;8.8.8.8'  # Upstream DNS servers
+      DNSSEC: 'false'
+      DNSMASQ_LISTENING: 'all'
+
+    volumes:
+      - /data/pihole/data/pihole:/etc/pihole
+      - /data/pihole/data/dnsmasq:/etc/dnsmasq.d
+
+    cap_add:
+      - NET_ADMIN
+
+    networks:
+      critical_network:
+        ipv4_address: 172.26.0.2
+
+    healthcheck:
+      test: ["CMD", "dig", "+short", "@127.0.0.1", "google.com"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    labels:
+      - "homelab.service=pihole"
+      - "homelab.backup=config"
+      - "homelab.critical=true"
+
+  # Vaultwarden - Self-hosted password manager (Bitwarden compatible)
+  vaultwarden:
+    image: vaultwarden/server:alpine
+    container_name: vaultwarden
+    restart: unless-stopped
+
+    # No ports exposed directly - accessed via Caddy reverse proxy
+    expose:
+      - "80"
+      - "3012"  # WebSocket notifications
+
+    environment:
+      DOMAIN: 'https://sweetrpi-desktop.tailc12764.ts.net:9000'
+      WEBSOCKET_ENABLED: 'true'
+      SIGNUPS_ALLOWED: 'false'  # Disable new signups for security
+      INVITATIONS_ALLOWED: 'true'
+      SHOW_PASSWORD_HINT: 'false'
+      LOG_FILE: '/data/vaultwarden.log'
+      LOG_LEVEL: 'info'
+      EXTENDED_LOGGING: 'true'
+
+    volumes:
+      - /data/compose/16/vw-data:/data
+
+    networks:
+      - critical_network
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:80/alive"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+    labels:
+      - "homelab.service=vaultwarden"
+      - "homelab.backup=database"
+      - "homelab.critical=true"
+      - "homelab.backup.script=/usr/local/bin/backup-vaultwarden"
+
+  # Caddy - Reverse proxy with automatic HTTPS
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"  # HTTP
+      - "8443:8443"  # HTTPS (Nextcloud)
+      - "9000:9000"  # HTTPS (Vaultwarden)
+
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - /home/sweetrpi/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - /opt/caddy/certs:/opt/caddy/certs:ro
+
+    networks:
+      - critical_network
+
+    depends_on:
+      - vaultwarden
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:2019/config/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+    labels:
+      - "homelab.service=caddy"
+      - "homelab.backup=config"
+      - "homelab.critical=true"
+
+  # Portainer - Docker management UI (optional, can be removed)
+  portainer:
+    image: portainer/portainer-ee:latest
+    container_name: portainer
+    restart: unless-stopped
+
+    ports:
+      - "9443:9443"  # HTTPS
+      - "8000:8000"  # Tunnel server
+
+    volumes:
+      - portainer_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    networks:
+      - critical_network
+
+    security_opt:
+      - no-new-privileges:true
+
+    labels:
+      - "homelab.service=portainer"
+      - "homelab.backup=none"
+      - "homelab.critical=false"
+
+volumes:
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
+  portainer_data:
+    driver: local
+
+# Security Notes:
+# - Vaultwarden has no exposed ports (accessed via Caddy only)
+# - All services on isolated network
+# - UFW firewall limits external access
+# - Healthchecks ensure service availability
+# - Automatic restarts unless stopped manually

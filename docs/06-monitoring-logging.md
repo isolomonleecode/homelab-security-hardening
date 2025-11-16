@@ -82,3 +82,4 @@ curl http://192.168.0.52:3100/ready      # Loki from Pi4
 - Do not run this on Unraid to keep production stable
 - Promtail is read-only; no changes to containers
  - If Pi DNS cannot resolve `grafana.homelab.local`, use the Grafana host IP in Promtail config, or add an A record in Pi-hole and revert to hostname later
+

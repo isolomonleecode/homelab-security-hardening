@@ -38,3 +38,4 @@ findings/vulnerability-summary.md
 - Capture before/after command outputs
 - Include CSV/MD artifacts in `findings/`
 - Summarize impact in executive terms (risk reduced, blast radius narrowed)
+
