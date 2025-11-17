@@ -1,7 +1,7 @@
 # Cybersecurity Portfolio - Latrent Childs
 
-**CompTIA A+ Certified | Aspiring Security Analyst**
-**Houston, TX** | **832-985-9411** | **Tchilds07@icloud.com**
+**CompTIA A+ & Security+ Certified | Aspiring Security Analyst**
+**Houston, TX** | **832-985-9411** | **latrent.childs@jnelee.com**
 **LinkedIn:** https://www.linkedin.com/in/latrent-childs/
 **GitHub:** https://github.com/isolomonleecode
 
@@ -635,11 +635,13 @@ Systematic vulnerability scanning, risk assessment, and remediation of container
 
 **Current:**
 - ✅ CompTIA A+ (2022)
+- ✅ CompTIA Security+ (September 2024)
 - 🔄 TryHackMe (Active learner - vulnerability analysis, network security, penetration testing)
 
 **Planned:**
-- 📋 CompTIA Security+ (Q1 2025)
-- 📋 CompTIA CySA+ (Q2 2025)
+- 🎯 CompTIA Network+ (Q4 2024 - Primary Goal)
+- 📋 CompTIA CySA+ (Q1 2025)
+- 📋 CompTIA SecAI+ (Q1 2026 - AI Security)
 - 📋 TryHackMe SOC Level 1 Learning Path
 
 ---
@@ -715,9 +717,10 @@ homelab-security-hardening/
    - Practice vulnerability exploitation in controlled environment
    - Document findings in portfolio
 
-3. **Security+ Preparation**
-   - Study certification domains
-   - Map homelab projects to Security+ objectives
+3. **Network+ Certification** 🎯
+   - Study networking fundamentals (20 hrs/week for 8 weeks)
+   - Map Home SOC network architecture to Network+ objectives
+   - Practice labs (subnetting, VLANs, routing, DNS, VPN)
    - Practice exam questions
 
 4. **Advanced Homelab Projects**
