@@ -13,7 +13,7 @@
 Structured 90-day plan to transition from Technical Support Specialist to Security Analyst role through targeted skill development, certification achievement, portfolio optimization, and strategic job applications. Leverages existing homelab infrastructure, TryHackMe learning platform, and documented portfolio projects.
 
 **Current Status:**
-- ✅ CompTIA A+ Certified (2022)
+- ✅ CompTIA A+ Certified (2022, Renewed 2025)
 - ✅ CompTIA Security+ Certified (September 2024)
 - ✅ 13 documented security projects
 - ✅ Production homelab (7 devices, 30+ containers)
@@ -118,7 +118,7 @@ Structured 90-day plan to transition from Technical Support Specialist to Securi
 
 ### CompTIA Network+ Certification 🎯 PRIMARY GOAL
 
-**Target Date:** Week 8 (60 days from start)
+**Target Date:** Q1 2025 (60 days from start)
 **Budget:** $400 (exam voucher + study materials)
 **Study Hours:** 15-20 hours/week = 120-160 hours total
 
@@ -188,15 +188,15 @@ Structured 90-day plan to transition from Technical Support Specialist to Securi
 ### Certification Roadmap (2024-2026)
 
 **Completed:**
-- ✅ **CompTIA A+** (2022) - Foundation
+- ✅ **CompTIA A+** (2022, Renewed 2025) - Foundation
 - ✅ **CompTIA Security+** (September 2024) - Security fundamentals
 
-**Current Focus (Q4 2024):**
+**Current Focus (Q1 2025):**
 - 🎯 **CompTIA Network+** (Target: 60 days) - Networking expertise
 
 **2025 Roadmap:**
 
-**Q1 2025: Specialized Security Skills**
+**Q2 2025: Specialized Security Skills**
 - 📋 **CompTIA CySA+** (Cybersecurity Analyst)
   - Why: Focuses on threat detection, analysis, and incident response
   - Maps to: Home SOC SIEM work, log analysis, security monitoring
@@ -204,7 +204,7 @@ Structured 90-day plan to transition from Technical Support Specialist to Securi
   - Study time: 120-150 hours
   - Cost: $400
 
-**Q2 2025: Penetration Testing or Cloud Security**
+**Q3 2025: Penetration Testing or Cloud Security**
 Option A: Offensive Security
 - 📋 **CompTIA PenTest+**
   - Why: Entry-level penetration testing skills
@@ -221,7 +221,7 @@ Option B: Cloud Security
   - Study time: 180-200 hours
   - Cost: $300-400
 
-**Q3-Q4 2025: Advanced Skills**
+**Q4 2025: Advanced Skills**
 - 📋 **GIAC Security Essentials (GSEC)** OR **Certified Ethical Hacker (CEH)**
   - GSEC: Broad security knowledge (SANS training, expensive but respected)
   - CEH: Well-known penetration testing cert (good for DoD/government)
@@ -267,10 +267,10 @@ Option C: Security Architecture
 **Recommended Certification Path (Optimized for ROI):**
 
 **Year 1 (2024-2025):**
-1. Security+ ✅ (Complete)
-2. Network+ 🎯 (In Progress)
-3. CySA+ (Q1 2025)
-4. AWS Security Specialty OR PenTest+ (Q2 2025)
+1. Security+ ✅ (Complete - September 2024)
+2. Network+ 🎯 (In Progress - Q1 2025)
+3. CySA+ (Q2 2025)
+4. AWS Security Specialty OR PenTest+ (Q3 2025)
 
 **Year 2 (2025-2026):**
 5. SecAI+ (Q1 2026) ⭐ **PRIORITY - Early adopter advantage**

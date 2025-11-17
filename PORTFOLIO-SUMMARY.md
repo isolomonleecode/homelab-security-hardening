@@ -634,13 +634,13 @@ Systematic vulnerability scanning, risk assessment, and remediation of container
 ### Certifications & Learning
 
 **Current:**
-- ✅ CompTIA A+ (2022)
+- ✅ CompTIA A+ (2022, Renewed 2025)
 - ✅ CompTIA Security+ (September 2024)
 - 🔄 TryHackMe (Active learner - vulnerability analysis, network security, penetration testing)
 
 **Planned:**
-- 🎯 CompTIA Network+ (Q4 2024 - Primary Goal)
-- 📋 CompTIA CySA+ (Q1 2025)
+- 🎯 CompTIA Network+ (Q1 2025 - Primary Goal)
+- 📋 CompTIA CySA+ (Q2 2025)
 - 📋 CompTIA SecAI+ (Q1 2026 - AI Security)
 - 📋 TryHackMe SOC Level 1 Learning Path
 
