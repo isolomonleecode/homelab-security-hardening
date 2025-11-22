@@ -1,0 +1,131 @@
+version: '3.8'
+
+# Wazuh SIEM Deployment for Homelab Security Monitoring
+# Author: Latrent Childs
+# Purpose: Enterprise-grade SIEM for security event detection and incident response
+# Integration: Complements existing Grafana/Loki/Prometheus stack
+
+services:
+  wazuh.manager:
+    image: wazuh/wazuh-manager:4.9.0
+    container_name: wazuh-manager
+    hostname: wazuh-manager
+    restart: unless-stopped
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 655360
+        hard: 655360
+    ports:
+      - "1514:1514"     # Agent communication
+      - "1515:1515"     # Agent enrollment
+      - "514:514/udp"   # Syslog (optional)
+      - "55000:55000"   # API
+    environment:
+      - INDEXER_URL=https://wazuh.indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=SecretPassword  # CHANGE THIS IN PRODUCTION
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/root-ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/filebeat.pem
+      - SSL_KEY=/etc/ssl/filebeat.key
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-  # CHANGE THIS IN PRODUCTION
+    volumes:
+      - wazuh_api_configuration:/var/ossec/api/configuration
+      - wazuh_etc:/var/ossec/etc
+      - wazuh_logs:/var/ossec/logs
+      - wazuh_queue:/var/ossec/queue
+      - wazuh_var_multigroups:/var/ossec/var/multigroups
+      - wazuh_integrations:/var/ossec/integrations
+      - wazuh_active_response:/var/ossec/active-response/bin
+      - wazuh_agentless:/var/ossec/agentless
+      - wazuh_wodles:/var/ossec/wodles
+      - filebeat_etc:/etc/filebeat
+      - filebeat_var:/var/lib/filebeat
+    networks:
+      - wazuh_network
+
+  wazuh.indexer:
+    image: wazuh/wazuh-indexer:4.9.0
+    container_name: wazuh-indexer
+    hostname: wazuh-indexer
+    restart: unless-stopped
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"  # Adjust based on your RAM (minimum 1GB)
+      - "bootstrap.memory_lock=true"
+      - "discovery.type=single-node"
+      - "network.host=0.0.0.0"
+      - "DISABLE_SECURITY_PLUGIN=false"
+      - "DISABLE_INSTALL_DEMO_CONFIG=false"
+    volumes:
+      - wazuh_indexer_data:/var/lib/wazuh-indexer
+      - ./indexer_config/opensearch.yml:/usr/share/wazuh-indexer/opensearch.yml
+      - ./indexer_config/internal_users.yml:/usr/share/wazuh-indexer/opensearch-security/internal_users.yml
+    networks:
+      - wazuh_network
+
+  wazuh.dashboard:
+    image: wazuh/wazuh-dashboard:4.9.0
+    container_name: wazuh-dashboard
+    hostname: wazuh-dashboard
+    restart: unless-stopped
+    ports:
+      - "5601:5601"     # Web UI - Access at http://YOUR_IP:5601
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=SecretPassword  # CHANGE THIS IN PRODUCTION
+      - WAZUH_API_URL=https://wazuh.manager
+      - DASHBOARD_USERNAME=kibanaserver
+      - DASHBOARD_PASSWORD=kibanaserver  # CHANGE THIS IN PRODUCTION
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-    # CHANGE THIS IN PRODUCTION
+    volumes:
+      - ./dashboard_config/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml
+      - ./dashboard_config/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+      - wazuh_dashboard_config:/usr/share/wazuh-dashboard/data/wazuh/config
+      - wazuh_dashboard_custom:/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
+    depends_on:
+      - wazuh.indexer
+      - wazuh.manager
+    networks:
+      - wazuh_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  wazuh_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
+
+volumes:
+  wazuh_api_configuration:
+  wazuh_etc:
+  wazuh_logs:
+  wazuh_queue:
+  wazuh_var_multigroups:
+  wazuh_integrations:
+  wazuh_active_response:
+  wazuh_agentless:
+  wazuh_wodles:
+  filebeat_etc:
+  filebeat_var:
+  wazuh_indexer_data:
+  wazuh_dashboard_config:
+  wazuh_dashboard_custom:
